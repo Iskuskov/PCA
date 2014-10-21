@@ -27,7 +27,7 @@ public:
 
 public slots:
     void clearImage();
-    void buildPCA();
+    void buildPCA(QPainter* painter);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -38,14 +38,13 @@ protected:
 private:
     void resizeImage(QImage *image, const QSize &newSize);
 
+    QImage theImage;
+
     vector<QPointF> clickPoints;
 
-    double covarianceMatrix[2][2];
-    double means[2];
-    double eigenValues[2];
-
-    QList<QColor> myPenColors;
-    QImage theImage;
+    vector<double> means;
+    vector< vector<double> > covarianceMatrix;
+    vector<double> eigenValues;
 };
 
 #endif

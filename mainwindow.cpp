@@ -68,9 +68,9 @@ void MainWindow::testPrincomp()
         cov.at(i).resize(cov_size);
 
     PrinComp prinComp;
-    prinComp.compute_covariance_matrix(data, cov);
+    //prinComp.compute_covariance_matrix(data, cov);
 
-    prinComp.print(cov);
+    //prinComp.print(cov);
     //qDebug() << cov;
 
 }

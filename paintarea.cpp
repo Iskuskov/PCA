@@ -1,12 +1,16 @@
+#include "paintarea.h"
+
+#include <math.h>
 #include <QtGui>
 
-#include "paintarea.h"
-#include <stdlib.h>
-#include <math.h>
+#include "princomp.h"
 
 PaintArea::PaintArea(QWidget *parent)
     : QWidget(parent),
-      theImage(500, 500, QImage::Format_RGB32)
+      theImage(500, 500, QImage::Format_RGB32),
+      means(PrinComp::dimension),
+      covarianceMatrix(PrinComp::dimension, vector<double>(PrinComp::dimension)),
+      eigenValues(PrinComp::dimension)
 {
     clearImage();
 }
@@ -18,9 +22,9 @@ void PaintArea::clearImage()
     update();
 }
 
-void PaintArea::buildPCA()//QPainter* painter)
+void PaintArea::buildPCA(QPainter* painter)
 {
-    QPainter* painter = new QPainter(&theImage);
+//    QPainter* painter = new QPainter(&theImage);
 
     // Очищаем старый центр
     painter->setPen(QPen(QBrush(Qt::white), 10));
@@ -37,13 +41,14 @@ void PaintArea::buildPCA()//QPainter* painter)
     painter->drawEllipse(means[0], means[1], 10, 10);
 
     // Получаем главную компоненту и перпендикуляр к ней
-
+    PrinComp prinComp;
+//    prinComp.computePCA1();
 
 
     QLineF PCA(getPCA(clickPoints));
     QLineF ortoLine(getNormalLine(PCA));
 
-    // Отобржаем полученные прямые
+    // Отображаем полученные прямые
 
 
     painter->setPen(QPen(QBrush(Qt::darkBlue), 5));
@@ -89,6 +94,34 @@ void PaintArea::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.drawImage(QPoint(0, 0), theImage);
+
+    // Отображаем точки
+    painter.setBrush(Qt::red);
+    painter.setPen(Qt::red);
+    foreach (QPointF point, clickPoints)
+    {
+        painter.drawPoint(point);
+        painter.drawEllipse(point, 5, 5);
+    }
+
+    // Перерасчитываем главные компоненты
+    PrinComp prinComp;
+
+    prinComp.computeMeans(clickPoints, means);
+    prinComp.computeCovarianceMatrix(clickPoints, means, covarianceMatrix);
+    prinComp.computeEigenValues(covarianceMatrix, eigenValues);
+
+    QLineF firstPrincipalComponent = prinComp.computePCA1(clickPoints, means, covarianceMatrix, eigenValues);
+
+    // Отображаем центр
+    painter.setPen(QPen(QBrush(Qt::magenta), 5));
+    painter.drawEllipse(means[0], means[1], 10, 10);
+
+    // Отображаем главные компоненты
+    painter.setPen(QPen(QBrush(Qt::darkBlue), 5));
+    painter.drawLine(firstPrincipalComponent);
+
+    //buildPCA(&painter);
 }
 
 void PaintArea::resizeEvent(QResizeEvent *event)
@@ -117,22 +150,23 @@ void PaintArea::resizeImage(QImage *image, const QSize &newSize)
 
 void PaintArea::mousePressEvent(QMouseEvent *e)
 {
+//    double x[] = {37, 84, 39,  7, 92, 72, 22, 68, 83, 54};
+//    double y[] = {42, 77, 74, 61, 91,  2, 10, 93, 70, 36};
+
+//    QPointF point;
+//    for (int i = 0; i < 10; ++i)
+//    {
+//        point.setX(x[i]);
+//        point.setY(y[i]);
+
+//        clickPoints.push_back(point);
+//    }
+
+    // Добавляем точку
     QPointF newClickPoint = e->pos();
     clickPoints.push_back(newClickPoint);
 
-    // Отображаем точки
-    QPainter painter(&theImage);
-    painter.setBrush(Qt::red);
-    painter.setPen(Qt::red);
-    foreach (QPointF point, clickPoints)
-    {
-        painter.drawPoint(point);
-        painter.drawEllipse(point, 5, 5);
-    }
-
     update();
-
-    //buildPCA(&painter);
 }
 
 void PaintArea::computeCovarianceMatrix()

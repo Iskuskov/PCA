@@ -2,35 +2,35 @@
 #define PRINCOMP_H
 
 #include <vector>
+#include <QPointF>
+#include <QLineF>
 
 using namespace std;
 
+// Класс расчета метода главных компонент для QPointF
 class PrinComp
 {
 public:
-    PrinComp();
+    // Расчет среднего
+    void computeMeans(vector<QPointF> points,
+                      vector<double> & means);
 
-    // Ковариационная матрица
-    void compute_covariance_matrix(vector< vector<double> > & d, vector< vector<double> > & dst);
+    // Вычисление ковариационной матрицы
+    void computeCovarianceMatrix(vector<QPointF> points,
+                                 vector<double> means,
+                                 vector< vector<double> > & covarianceMatrix);
 
-    //Собственные векторы
+    // Вычисление собственных значений
+    void computeEigenValues(vector<vector<double> > covarianceMatrix,
+                            vector<double> & eigenValues);
 
+    // Вычисление первой главной компоненты (PC1)
+    QLineF computePCA1(vector<QPointF> points,
+                       vector<double> means,
+                       vector< vector<double> > covarianceMatrix,
+                       vector<double> eigenValues);
 
-
-    void outer_product(vector<double> row, vector<double> col, vector< vector<double> >& dst);
-
-    //computes row[i] - val for all i;
-    void subtract(vector<double> row, double val, vector<double>& dst);
-
-    //computes m[i][j] + m2[i][j]
-    void add(vector< vector<double> > m, vector< vector<double> > m2, vector< vector<double> >& dst);
-
-    double mean(std::vector<double> &data);
-
-    void scale(vector< vector<double> > & d, double alpha);
-
-
-    void print(vector< vector<double> > & data);
+    static int dimension;
 };
 
 #endif // PRINCOMP_H
