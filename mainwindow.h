@@ -3,12 +3,10 @@
 
 #include <QMainWindow>
 
-#include "paintarea.h"
-
-using namespace std;
+class PaintArea;
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -22,10 +20,7 @@ public:
     PaintArea *paintArea;
 
     QMenu *optionMenu;
-
-    QAction *buildPcaAct;
     QAction *clearScreenAct;
-
     QAction *testPrincompAct;
 
 public slots:

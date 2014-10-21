@@ -33,6 +33,7 @@ private:
     vector<double> means;
     vector< vector<double> > covarianceMatrix;
     vector<double> eigenValues;
+    vector< vector<double> > eigenVectors;
 };
 
 #endif

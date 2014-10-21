@@ -38,7 +38,8 @@ public:
     QLineF computePCA1(vector<QPointF> points,
                        vector<double> &means,
                        vector< vector<double> > &covarianceMatrix,
-                       vector<double> &eigenValues);
+                       vector<double> &eigenValues,
+                       vector< vector<double> > & eigenVectors);
 
     QLineF computePCA1(vector<QPointF> points);
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <QDebug>
 
-#include "princomp.h"
+#include "paintarea.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,10 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(paintArea);
 
     // Действия
-    buildPcaAct = new QAction(tr("&Build PCA"), this);
-    buildPcaAct->setShortcut(tr("Ctrl+P"));
-    connect(buildPcaAct, SIGNAL(triggered()), paintArea, SLOT(buildPCA()));
-
     clearScreenAct = new QAction(tr("&Clear Screen"), this);
     clearScreenAct->setShortcut(tr("Ctrl+L"));
     connect(clearScreenAct, SIGNAL(triggered()), paintArea, SLOT(clearImage()));
@@ -31,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Меню
     optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(clearScreenAct);
-    optionMenu->addAction(buildPcaAct);
     optionMenu->addAction(testPrincompAct);
     menuBar()->addMenu(optionMenu);
 
@@ -60,17 +55,4 @@ void MainWindow::testPrincomp()
     }
     data.push_back(vec_x);
     data.push_back(vec_y);
-
-    int cov_size = 2;
-
-    vector< vector<double> > cov(cov_size);
-    for (int i = 0; i < cov.size(); ++i)
-        cov.at(i).resize(cov_size);
-
-    PrinComp prinComp;
-    //prinComp.compute_covariance_matrix(data, cov);
-
-    //prinComp.print(cov);
-    //qDebug() << cov;
-
 }
