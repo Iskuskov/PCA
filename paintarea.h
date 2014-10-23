@@ -7,6 +7,11 @@ using namespace std;
 #include <QWidget>
 #include <vector>
 
+class QGraphicsScene;
+class QGraphicsPixmapItem;
+
+namespace pca {
+
 class PaintArea : public QWidget
 {
     Q_OBJECT
@@ -30,9 +35,15 @@ private:
 
     vector<QPointF> clickPoints;
 
+    //
     vector<double> means;
     vector< vector<double> > covarianceMatrix;
     vector<double> eigenValues;
+    vector< vector<double> > eigenVectors;
 };
+
+} // namespace
+
+
 
 #endif

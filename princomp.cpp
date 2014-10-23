@@ -4,8 +4,9 @@
 
 #include <QLineF>
 #include <QPointF>
-
 #include <QDebug>
+
+namespace pca {
 
 int PrinComp::dimension = 2;
 
@@ -96,62 +97,12 @@ void PrinComp::computeEigenVectors(vector< vector<double> > covarianceMatrix,
     eigenVectors[1][1] = bminus / denomMinus;
 }
 
-// Вычисление первой главной компоненты (PC1)
-// Возвращает нормаль вектора из центра
-QLineF PrinComp::computePCA1(vector<double> means,
-                             vector< vector<double> > covarianceMatrix,
-                             vector<double> eigenValues)
-{
-//    // Вычисление средних
-//    vector<double> means(DIMENSION);
-//    computeMeans(points, means);
-
-//    // Вычисление ковариационной матрицы
-//    vector< vector<double> > covarianceMatrix(DIMENSION, vector<double>(DIMENSION));
-//    computeCovarianceMatrix(points, covarianceMatrix);
-
-//    // Вычисление собственных значений
-//    vector<double> eigenValues(DIMENSION);
-//    computeEigenValues(points, eigenValues);
-
-
-
-    double majoraxis;       // PCA1
-    double minoraxis;       // PCA2
-
-    double slope;           // Наклон прямой
-    double proj_x, proj_y;  // Проекции прямой
-
-    double k = 2;           // scale factor
-    majoraxis = k*sqrtf(eigenValues[0]);
-    minoraxis = k*sqrtf(eigenValues[1]);
-
-    slope = (eigenValues[0] - covarianceMatrix[0][0]) / covarianceMatrix[1][0];
-    proj_x = majoraxis * sqrt( 1 / (1 + slope * slope) );
-    proj_y = proj_y * slope;
-
-
-
-
-    // Вычисление собственных значений
-    double a = covarianceMatrix[0][0];
-    double b = covarianceMatrix[1][0]; // covarianceMatrix[1][0] == covarianceMatrix[0][1];
-    double d = covarianceMatrix[1][1];
-
-    proj_x = b;
-    proj_y = eigenValues[0] - a;
-
-    QPointF start (means[0] - proj_x, means[1] - proj_y);
-    QPointF finish(means[0] + proj_x, means[1] + proj_y);
-
-    QLineF firstPrincipalComponent(start, finish);
-    return firstPrincipalComponent;
-}
-
-QLineF PrinComp::computePCA1(vector<QPointF> points,
-                   vector<double> & means,
-                   vector< vector<double> > & covarianceMatrix,
-                   vector<double> & eigenValues)
+// Последовательное вычисление необходимых данных
+void PrinComp::computePCAData(vector<QPointF> points,
+                             vector<double> & means,
+                             vector< vector<double> > & covarianceMatrix,
+                             vector<double> & eigenValues,
+                             vector< vector<double> > & eigenVectors)
 {
     // Вычисление средних
     computeMeans(points, means);
@@ -162,33 +113,59 @@ QLineF PrinComp::computePCA1(vector<QPointF> points,
     // Вычисление собственных значений
     computeEigenValues(covarianceMatrix, eigenValues);
 
-    QLineF firstPrincipalComponent = computePCA1(means, covarianceMatrix, eigenValues);
-    return firstPrincipalComponent;
+    // Вычисление собственных векторов
+    computeEigenVectors(covarianceMatrix, eigenValues, eigenVectors);
 }
 
-QLineF PrinComp::computePCA1(vector<QPointF> points)
+/* ----------------------------------------------------- */
+
+// Вычисление центральной точки
+QPointF PrinComp::computeMeanPoint(vector<QPointF> points)
 {
+    // Вычисление средних
+    vector<double> means(dimension);
+    computeMeans(points, means);
+
+    // Центральная точка
+    QPointF meanPoint(means[0], means[1]);
+    return meanPoint;
+}
+
+// Вычисление главных компонент (первой и второй)
+vector<QLineF> PrinComp::computePCA(vector<QPointF> points)
+{
+    // Вычисляем необходимые данные
     vector<double> means(dimension);
     vector< vector<double> > covarianceMatrix(dimension, vector<double>(dimension));
     vector<double> eigenValues(dimension);
+    vector< vector<double> > eigenVectors(dimension, vector<double>(dimension));
 
-    // Вычисление средних
-    computeMeans(points, means);
+    computePCAData(points, means, covarianceMatrix, eigenValues, eigenVectors);
 
-    // Вычисление ковариационной матрицы
-    computeCovarianceMatrix(points, means, covarianceMatrix);
+    // Вычисляем главные компоненты (первую и вторую)
+    QLineF firstPrincipalComponent;
+    QLineF secondPrincipalComponent;
 
-    // Вычисление собственных значений
-    computeEigenValues(covarianceMatrix, eigenValues);
+    // Полуоси (первой и второй главных компонент)
+    double k = 2; // scale factor
+    double majoraxis = k*sqrtf(eigenValues[0]);
+    double minoraxis = k*sqrtf(eigenValues[1]);
 
-    QLineF firstPrincipalComponent = computePCA1(means, covarianceMatrix, eigenValues);
-    return firstPrincipalComponent;
+    // Первая главная компонента
+    QPointF start (means[0] - eigenVectors[0][0] * majoraxis, means[1] - eigenVectors[0][1] * majoraxis);
+    QPointF finish(means[0] + eigenVectors[0][0] * majoraxis, means[1] + eigenVectors[0][1] * majoraxis);
+    firstPrincipalComponent.setPoints(start, finish);
+
+    // Вторая главная компонента
+    QPointF secondStart (means[0] - eigenVectors[1][0] * minoraxis, means[1] - eigenVectors[1][1] * minoraxis);
+    QPointF secondFinish(means[0] + eigenVectors[1][0] * minoraxis, means[1] + eigenVectors[1][1] * minoraxis);
+    secondPrincipalComponent.setPoints(secondStart, secondFinish);
+
+    vector<QLineF> PCAVectors;
+    PCAVectors.push_back(firstPrincipalComponent);
+    PCAVectors.push_back(secondPrincipalComponent);
+
+    return PCAVectors;
 }
 
-
-//// Вычисление второй главной компоненты (PC2)
-//QLineF PrinComp::getNormalLine(QLineF line)
-//{
-//    QLineF normalLine = line.normalVector();
-//    return normalLine;
-//}
+} // namespace

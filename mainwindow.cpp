@@ -5,6 +5,10 @@
 #include <QDebug>
 
 #include "paintarea.h"
+#include "princompview.h"
+#include "princompscene.h"
+
+#include <QMouseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,13 +16,29 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    paintArea = new PaintArea;
-    setCentralWidget(paintArea);
+    // Область рисования
+//    paintArea = new PCA::PaintArea;
+//    setCentralWidget(paintArea);
+
+//    view = new pca::PrincompView();
+//    scene = new QGraphicsScene(0, 0, 500, 500);
+//    setCentralWidget(view);
+//    view->setScene(scene);
+//    view->show();
+
+
+    view = new QGraphicsView;
+    view->setRenderHint(QPainter::Antialiasing, true);
+    scene = new pca::PrincompScene;
+    setCentralWidget(view);
+    view->setScene(scene);
+    view->show();
 
     // Действия
     clearScreenAct = new QAction(tr("&Clear Screen"), this);
     clearScreenAct->setShortcut(tr("Ctrl+L"));
-    connect(clearScreenAct, SIGNAL(triggered()), paintArea, SLOT(clearImage()));
+//    connect(clearScreenAct, SIGNAL(triggered()), paintArea, SLOT(clearImage()));
+    connect(clearScreenAct, SIGNAL(triggered()), scene, SLOT(clear()));
 
     testPrincompAct = new QAction(tr("&Test princomp"), this);
     testPrincompAct->setShortcut(tr("Ctrl+T"));

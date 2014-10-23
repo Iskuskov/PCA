@@ -3,10 +3,12 @@
 
 #include <vector>
 
-using namespace std;
-
 class QPointF;
 class QLineF;
+
+using namespace std;
+
+namespace pca {
 
 // Класс расчета метода главных компонент для QPointF
 class PrinComp
@@ -30,19 +32,23 @@ public:
                              vector<double> eigenValues,
                              vector< vector<double> > & eigenVectors);
 
-    // Вычисление первой главной компоненты (PC1)
-    QLineF computePCA1(vector<double> means,
-                       vector< vector<double> > covarianceMatrix,
-                       vector<double> eigenValues);
+    // Последовательное вычисление необходимых данных
+    void computePCAData(vector<QPointF> points,
+                        vector<double> & means,
+                        vector< vector<double> > & covarianceMatrix,
+                        vector<double> & eigenValues,
+                        vector< vector<double> > & eigenVectors);
 
-    QLineF computePCA1(vector<QPointF> points,
-                       vector<double> &means,
-                       vector< vector<double> > &covarianceMatrix,
-                       vector<double> &eigenValues);
+    // Вычисление центральной точки
+    QPointF computeMeanPoint(vector<QPointF> points);
 
-    QLineF computePCA1(vector<QPointF> points);
+    // Вычисление главных компонент (первой и второй)
+    vector<QLineF> computePCA(vector<QPointF> points);
 
+    // Размерность - плоскость (2D)
     static int dimension;
 };
+
+} // namespace
 
 #endif // PRINCOMP_H

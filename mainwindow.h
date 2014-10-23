@@ -3,11 +3,17 @@
 
 #include <QMainWindow>
 
-class PaintArea;
+namespace pca {
+    class PaintArea;
+    class PrincompScene;
+}
 
 namespace Ui {
     class MainWindow;
 }
+
+class QGraphicsView;
+class QGraphicsScene;
 
 class MainWindow : public QMainWindow
 {
@@ -17,7 +23,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    PaintArea *paintArea;
+    pca::PaintArea *paintArea;
 
     QMenu *optionMenu;
     QAction *clearScreenAct;
@@ -28,6 +34,11 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+
+private:
+    QGraphicsView  *view;
+    //QGraphicsScene *scene;
+    pca::PrincompScene *scene;
 };
 
 #endif // MAINWINDOW_H
