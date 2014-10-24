@@ -10,43 +10,43 @@ using namespace std;
 
 namespace pca {
 
-// Класс расчета метода главных компонент для QPointF
+// РљР»Р°СЃСЃ СЂР°СЃС‡РµС‚Р° РјРµС‚РѕРґР° РіР»Р°РІРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚ РґР»СЏ QPointF
 class PrinComp
 {
 public:
-    // Расчет среднего
+    // Р Р°СЃС‡РµС‚ СЃСЂРµРґРЅРµРіРѕ
     void computeMeans(vector<QPointF> points,
                       vector<double> & means);
 
-    // Вычисление ковариационной матрицы
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
     void computeCovarianceMatrix(vector<QPointF> points,
                                  vector<double> means,
                                  vector< vector<double> > & covarianceMatrix);
 
-    // Вычисление собственных значений
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
     void computeEigenValues(vector<vector<double> > covarianceMatrix,
                             vector<double> & eigenValues);
 
-    // Вычисление собственных векторов
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… РІРµРєС‚РѕСЂРѕРІ
     void computeEigenVectors(vector< vector<double> > covarianceMatrix,
                              vector<double> eigenValues,
                              vector< vector<double> > & eigenVectors);
 
-    // Последовательное вычисление необходимых данных
+    // РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРµ РІС‹С‡РёСЃР»РµРЅРёРµ РЅРµРѕР±С…РѕРґРёРјС‹С… РґР°РЅРЅС‹С…
     void computePCAData(vector<QPointF> points,
                         vector<double> & means,
                         vector< vector<double> > & covarianceMatrix,
                         vector<double> & eigenValues,
                         vector< vector<double> > & eigenVectors);
 
-    // Вычисление центральной точки
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№ С‚РѕС‡РєРё
     QPointF computeMeanPoint(vector<QPointF> points);
 
-    // Вычисление главных компонент (первой и второй)
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ РіР»Р°РІРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚ (РїРµСЂРІРѕР№ Рё РІС‚РѕСЂРѕР№)
     vector<QLineF> computePCA(vector<QPointF> points);
 
-    // Размерность - плоскость (2D)
-    static int dimension;
+    // Р Р°Р·РјРµСЂРЅРѕСЃС‚СЊ - РїР»РѕСЃРєРѕСЃС‚СЊ (2D)
+    static int m_dimension;
 };
 
 } // namespace

@@ -8,13 +8,13 @@
 
 namespace pca {
 
-int PrinComp::dimension = 2;
+int PrinComp::m_dimension = 2;
 
-// Вычисление средних
+// Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСЂРµРґРЅРёС…
 void PrinComp::computeMeans(vector<QPointF> points,
                             vector<double> & means)
 {
-    // Инициализация
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     means[0] = 0;
     means[1] = 0;
 
@@ -26,19 +26,19 @@ void PrinComp::computeMeans(vector<QPointF> points,
     means[1] /= points.size();
 }
 
-// Вычисление ковариационной матрицы
+// Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
 void PrinComp::computeCovarianceMatrix(vector<QPointF> points,
                                        vector<double> means,
                                        vector< vector<double> > & covarianceMatrix)
 {
-//    // Вычисление средних
+//    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСЂРµРґРЅРёС…
 //    vector<double> means(DIMENSION);
 //    computeMeans(points, means);
 
-    // Вычисление ковариационной матрицы
-    for (int i = 0; i < dimension; i++)
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
+    for (int i = 0; i < m_dimension; i++)
     {
-        for (int j = 0; j < dimension; j++)
+        for (int j = i; j < m_dimension; j++)
         {
             covarianceMatrix[i][j] = 0.0;
             for (unsigned k = 0; k < points.size(); k++)
@@ -49,45 +49,53 @@ void PrinComp::computeCovarianceMatrix(vector<QPointF> points,
                 covarianceMatrix[i][j] += (means[i] - coord_i) * (means[j] - coord_j);
             }
             covarianceMatrix[i][j] /= points.size() - 1;
+
+            // Р’ СЃРёР»Сѓ СЃРёРјРјРµС‚СЂРёС‡РЅРѕСЃС‚Рё РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
+            if (i != j)
+                covarianceMatrix[j][i] = covarianceMatrix[i][j];
         }
     }
 
     return;
 }
 
-// Вычисление собственных значений
+// Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 void PrinComp::computeEigenValues(vector< vector<double> > covarianceMatrix,
                                   vector<double> & eigenValues)
 {
-    // Инициализация
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     eigenValues[0] = 0;
     eigenValues[1] = 0;
 
-//    // Вычисление ковариационной матрицы
+//    // Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
 //    vector< vector<double> > covarianceMatrix(DIMENSION, vector<double>(DIMENSION));
 //    computeCovarianceMatrix(points, covarianceMatrix);
 
-    // Вычисление собственных значений
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№:
+    // Р РµС€Р°РµРј С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёС‡РµСЃРєРѕРµ СѓСЂР°РЅРµРЅРёРµ (РєРІР°РґСЂР°С‚РЅРѕРµ)
     double a = covarianceMatrix[0][0];
     double b = covarianceMatrix[1][0]; // covarianceMatrix[1][0] == covarianceMatrix[0][1];
     double d = covarianceMatrix[1][1];
 
-    eigenValues[0] = ( (a + d) + sqrt( pow((a - d), 2) + (4 * pow(b, 2) ) ) ) / 2;
-    eigenValues[1] = ( (a + d) - sqrt( pow((a - d), 2) + (4 * pow(b, 2) ) ) ) / 2;
+    // РљРѕСЂРµРЅСЊ РёР· РґРёСЃРєСЂРёРјРёРЅР°РЅС‚Р° (РїРѕСЃР»Рµ СѓРїСЂРѕС‰РµРЅРёСЏ)
+    double discriminantSqrt = sqrt( pow((a - d), 2) + (4 * pow(b, 2) ) );
+
+    eigenValues[0] = ( (a + d) + discriminantSqrt ) / 2;
+    eigenValues[1] = ( (a + d) - discriminantSqrt ) / 2;
 }
 
-// Вычисление собственных векторов
+// Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… РІРµРєС‚РѕСЂРѕРІ
 void PrinComp::computeEigenVectors(vector< vector<double> > covarianceMatrix,
                                    vector<double> eigenValues,
                                    vector< vector<double> > & eigenVectors)
 {
-    // Собственные векторы
+    // РЎРѕР±СЃС‚РІРµРЅРЅС‹Рµ РІРµРєС‚РѕСЂС‹
     double aplus  = covarianceMatrix[0][0] + covarianceMatrix[0][1] - eigenValues[1];
     double bplus  = covarianceMatrix[1][1] + covarianceMatrix[0][1] - eigenValues[1];
     double aminus = covarianceMatrix[0][0] + covarianceMatrix[0][1] - eigenValues[0];
     double bminus = covarianceMatrix[1][1] + covarianceMatrix[0][1] - eigenValues[0];
 
-    // Нормализация
+    // РќРѕСЂРјР°Р»РёР·Р°С†РёСЏ
     double denomPlus = sqrtf(aplus*aplus + bplus*bplus);
     double denomMinus= sqrtf(aminus*aminus + bminus*bminus);
 
@@ -97,66 +105,66 @@ void PrinComp::computeEigenVectors(vector< vector<double> > covarianceMatrix,
     eigenVectors[1][1] = bminus / denomMinus;
 }
 
-// Последовательное вычисление необходимых данных
+// РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРµ РІС‹С‡РёСЃР»РµРЅРёРµ РЅРµРѕР±С…РѕРґРёРјС‹С… РґР°РЅРЅС‹С…
 void PrinComp::computePCAData(vector<QPointF> points,
-                             vector<double> & means,
-                             vector< vector<double> > & covarianceMatrix,
-                             vector<double> & eigenValues,
-                             vector< vector<double> > & eigenVectors)
+                              vector<double> & means,
+                              vector< vector<double> > & covarianceMatrix,
+                              vector<double> & eigenValues,
+                              vector< vector<double> > & eigenVectors)
 {
-    // Вычисление средних
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСЂРµРґРЅРёС…
     computeMeans(points, means);
 
-    // Вычисление ковариационной матрицы
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРІР°СЂРёР°С†РёРѕРЅРЅРѕР№ РјР°С‚СЂРёС†С‹
     computeCovarianceMatrix(points, means, covarianceMatrix);
 
-    // Вычисление собственных значений
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
     computeEigenValues(covarianceMatrix, eigenValues);
 
-    // Вычисление собственных векторов
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃРѕР±СЃС‚РІРµРЅРЅС‹С… РІРµРєС‚РѕСЂРѕРІ
     computeEigenVectors(covarianceMatrix, eigenValues, eigenVectors);
 }
 
 /* ----------------------------------------------------- */
 
-// Вычисление центральной точки
+// Р’С‹С‡РёСЃР»РµРЅРёРµ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№ С‚РѕС‡РєРё
 QPointF PrinComp::computeMeanPoint(vector<QPointF> points)
 {
-    // Вычисление средних
-    vector<double> means(dimension);
+    // Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСЂРµРґРЅРёС…
+    vector<double> means(m_dimension);
     computeMeans(points, means);
 
-    // Центральная точка
+    // Р¦РµРЅС‚СЂР°Р»СЊРЅР°СЏ С‚РѕС‡РєР°
     QPointF meanPoint(means[0], means[1]);
     return meanPoint;
 }
 
-// Вычисление главных компонент (первой и второй)
+// Р’С‹С‡РёСЃР»РµРЅРёРµ РіР»Р°РІРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚ (РїРµСЂРІРѕР№ Рё РІС‚РѕСЂРѕР№)
 vector<QLineF> PrinComp::computePCA(vector<QPointF> points)
 {
-    // Вычисляем необходимые данные
-    vector<double> means(dimension);
-    vector< vector<double> > covarianceMatrix(dimension, vector<double>(dimension));
-    vector<double> eigenValues(dimension);
-    vector< vector<double> > eigenVectors(dimension, vector<double>(dimension));
+    // Р’С‹С‡РёСЃР»СЏРµРј РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґР°РЅРЅС‹Рµ
+    vector<double> means(m_dimension);
+    vector< vector<double> > covarianceMatrix(m_dimension, vector<double>(m_dimension));
+    vector<double> eigenValues(m_dimension);
+    vector< vector<double> > eigenVectors(m_dimension, vector<double>(m_dimension));
 
     computePCAData(points, means, covarianceMatrix, eigenValues, eigenVectors);
 
-    // Вычисляем главные компоненты (первую и вторую)
+    // Р’С‹С‡РёСЃР»СЏРµРј РіР»Р°РІРЅС‹Рµ РєРѕРјРїРѕРЅРµРЅС‚С‹ (РїРµСЂРІСѓСЋ Рё РІС‚РѕСЂСѓСЋ)
     QLineF firstPrincipalComponent;
     QLineF secondPrincipalComponent;
 
-    // Полуоси (первой и второй главных компонент)
+    // РџРѕР»СѓРѕСЃРё (РїРµСЂРІРѕР№ Рё РІС‚РѕСЂРѕР№ РіР»Р°РІРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚)
     double k = 2; // scale factor
     double majoraxis = k*sqrtf(eigenValues[0]);
     double minoraxis = k*sqrtf(eigenValues[1]);
 
-    // Первая главная компонента
+    // РџРµСЂРІР°СЏ РіР»Р°РІРЅР°СЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
     QPointF start (means[0] - eigenVectors[0][0] * majoraxis, means[1] - eigenVectors[0][1] * majoraxis);
     QPointF finish(means[0] + eigenVectors[0][0] * majoraxis, means[1] + eigenVectors[0][1] * majoraxis);
     firstPrincipalComponent.setPoints(start, finish);
 
-    // Вторая главная компонента
+    // Р’С‚РѕСЂР°СЏ РіР»Р°РІРЅР°СЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
     QPointF secondStart (means[0] - eigenVectors[1][0] * minoraxis, means[1] - eigenVectors[1][1] * minoraxis);
     QPointF secondFinish(means[0] + eigenVectors[1][0] * minoraxis, means[1] + eigenVectors[1][1] * minoraxis);
     secondPrincipalComponent.setPoints(secondStart, secondFinish);

@@ -23,22 +23,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    pca::PaintArea *paintArea;
-
-    QMenu *optionMenu;
-    QAction *clearScreenAct;
-    QAction *testPrincompAct;
-
-public slots:
-    void testPrincomp();
-
 private:
     Ui::MainWindow *ui;
 
-private:
-    QGraphicsView  *view;
-    //QGraphicsScene *scene;
-    pca::PrincompScene *scene;
+    QMenu   *m_optionMenu;
+    QAction *m_clearScreenAct;
+
+    QGraphicsView *m_view;
+    pca::PrincompScene *m_scene;
 };
 
 #endif // MAINWINDOW_H
